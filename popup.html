@@ -1,16 +1,24 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FocusGuard</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="popup.js"></script>
-  </head>
-  <body>
-    <div class="popup-container">
-      <h2>FocusBlock Settings</h2>
-      <label for="unblockSite">Unblock Site:</label>
-      <input type="text" id="unblockSite" placeholder="Enter site to unblock">
-      <button id="unblockButton">Unblock</button>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <h1>FocusGuard</h1>
+
+        <div class="input-group">
+            <input type="text" id="website-input" placeholder="Enter website URL" />
+            <button id="add-website">Block</button>
+        </div>
+
+        <h2>Blocked Websites</h2>
+        <ul id="blocked-list"></ul>
     </div>
-  </body>
+
+    <script src="popup.js"></script>
+</body>
 </html>
