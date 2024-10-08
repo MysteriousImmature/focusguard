@@ -1,2 +1,17 @@
-# focusguard
-FocusGuard is the ultimate productivity tool that empowers users to maintain laser-like focus during their online activities. With a straightforward and intuitive interface, this browser extension allows users to easily block access to distracting websites such as Facebook, Twitter, Instagram, and LinkedIn. Tailor your experience by customizing the list of blocked sites, ensuring that you stay on track and boost your productivity. When attempting to visit a blocked site, FocusGuard seamlessly redirects you to a custom "blocked.html" page, offering a gentle reminder to stay focused on your goals. Take control of your digital environment, eliminate distractions, and make the most of your online sessions with FocusGuard . Stay focused, stay productive. InstallFocusGuard today!
+# FocusGuard 🚫💻
+
+**FocusGuard** is a simple yet powerful browser extension designed to help you stay focused by blocking distracting websites. Customize your block list and manage your online habits with ease, right from your browser.
+
+## Features ✨
+
+- **Customizable Website Blocking**: Add or remove websites from your block list through an intuitive popup interface.
+- **Instant Blocking**: Changes are applied immediately, so you can stay focused without interruptions.
+- **Smart URL Handling**: Automatically cleans up website entries to ensure accurate blocking.
+- **Cross-Browser Compatibility**: Works seamlessly on both **Chrome** and **Firefox**.
+
+
+## Contributing 🤝
+
+Contributions are welcome! If you have ideas or improvements, feel free to fork the repo and submit a pull request. For major changes, please open an issue first to discuss what you'd like to change.
+
+Stay focused and productive with **FocusGuard**! 🔒
