@@ -1,72 +1,161 @@
+/* General Reset */
 * {
     box-sizing: border-box;
-}
-
-body {
-    font-family: 'Arial', sans-serif;
     margin: 0;
-    padding: 20px;
-    background-color: #f4f4f4;
-    height: 200px;
-    width: 300px;
-}
-
-.container {
-    max-width: 300px;
-    margin: auto;
-    background: #fff;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-h1, h2 {
-    color: #333;
-    text-align: center;
-}
-
-.input-group {
-    display: flex;
-    justify-content: space-between;
-}
-
-input[type="text"] {
-    width: 75%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-button {
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-#blocked-list {
-    list-style: none;
     padding: 0;
 }
 
-#blocked-list li {
-    background: #f8d7da;
-    margin: 5px 0;
-    padding: 10px;
-    border-left: 5px solid #dc3545;
+body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #e0e7ff, #f0f4ff);
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    width: 320px;
+    height: auto;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
 }
 
-#blocked-list li button {
-    background-color: #dc3545;
+.container {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+}
+
+/* Header Styling */
+h1 {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    font-size: 1.2em;
+    color: #4b5563;
+    margin: 20px 0 15px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 8px;
+}
+
+/* Input Group */
+.input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 6px rgba(99, 102, 241, 0.3);
+}
+
+button {
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #7e3af2, #5b21b6);
+    color: #fff;
     border: none;
-    color: white;
-    padding: 5px;
+    border-radius: 8px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    font-size: 1em;
+}
+
+button:hover {
+    background: linear-gradient(135deg, #5b21b6, #4c1d95);
+    transform: scale(1.05);
+}
+
+/* List Styling */
+#blocked-list,
+#predefined-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#blocked-list li,
+#predefined-list li {
+    background-color: #f9fafb;
+    padding: 14px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1em;
+    color: #374151;
+    transition: background-color 0.2s ease;
+}
+
+#blocked-list li:hover,
+#predefined-list li:hover {
+    background-color: #f3f4f6;
+}
+
+#blocked-list li button,
+#predefined-list input[type="checkbox"] {
+    cursor: pointer;
+    border: none;
+    outline: none;
+}
+
+/* Unblock Button */
+#blocked-list li button {
+    background-color: #f87171;
+    padding: 6px 12px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+#blocked-list li button:hover {
+    background-color: #e11d48;
+    transform: scale(1.1);
+}
+
+/* Checkbox Styling */
+#predefined-list input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #6366f1;
+    margin-right: 12px;
+    transform: scale(1.2);
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 320px) {
+    body {
+        padding: 15px;
+    }
+
+    .container {
+        padding: 20px;
+    }
+
+    button {
+        padding: 9px 14px;
+    }
 }
