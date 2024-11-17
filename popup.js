@@ -9,17 +9,19 @@ const predefinedSites = [
     { name: 'TikTok', url: 'tiktok.com' },
 ];
 
-// Load blocked sites and update checkboxes based on saved state
+// Load blocked sites and elapsed time from storage
 function updateBlockedList() {
-    chrome.storage.local.get(['blockedSites'], function (result) {
+    chrome.storage.local.get(['blockedSites', 'elapsedTime'], function (result) {
         const blockedSites = result.blockedSites || [];
+        const elapsedTime = result.elapsedTime || 0;  // Time in seconds
+
         const listElement = document.getElementById('blocked-list');
         listElement.innerHTML = ''; // Clear current list
 
         // Populate blocked list with user-added sites
         blockedSites.forEach((site, index) => {
             const li = document.createElement('li');
-            li.textContent = site;
+            li.textContent = `${site.url} - Times blocked: ${site.count}`;
             const removeButton = document.createElement('button');
             removeButton.textContent = "Unblock";
             removeButton.onclick = function () {
@@ -32,9 +34,25 @@ function updateBlockedList() {
         // Update predefined list checkboxes based on blockedSites
         document.querySelectorAll('.predefined-checkbox').forEach(checkbox => {
             const siteUrl = checkbox.getAttribute('data-url');
-            checkbox.checked = blockedSites.includes(siteUrl);
+            checkbox.checked = blockedSites.some(site => site.url === siteUrl);
         });
+
+        // Update elapsed time display
+        document.getElementById('elapsed-time').textContent = formatTime(elapsedTime);
     });
+}
+
+// Format elapsed time into a readable string (HH:MM:SS)
+function formatTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    return `${padZero(hours)}:${padZero(minutes)}:${padZero(remainingSeconds)}`;
+}
+
+// Add leading zero for single-digit hours, minutes, or seconds
+function padZero(num) {
+    return num < 10 ? '0' + num : num;
 }
 
 // Add or remove predefined site based on checkbox state
@@ -43,12 +61,18 @@ function togglePredefinedSite(event) {
 
     chrome.storage.local.get(['blockedSites'], function (result) {
         const blockedSites = result.blockedSites || [];
-        const siteIndex = blockedSites.indexOf(siteUrl);
+        const siteIndex = blockedSites.findIndex(site => site.url === siteUrl);
 
         if (event.target.checked) {
-            if (siteIndex === -1) blockedSites.push(siteUrl);
+            // If site is not already blocked, add it
+            if (siteIndex === -1) {
+                blockedSites.push({ url: siteUrl, count: 0 });
+            }
         } else {
-            if (siteIndex !== -1) blockedSites.splice(siteIndex, 1);
+            // If site is checked and then unchecked, remove it
+            if (siteIndex !== -1) {
+                blockedSites.splice(siteIndex, 1);
+            }
         }
 
         chrome.storage.local.set({ blockedSites: blockedSites }, updateBlockedList);
@@ -63,8 +87,10 @@ function addBlockedSite() {
     if (cleanUrl) {
         chrome.storage.local.get(['blockedSites'], function (result) {
             const blockedSites = result.blockedSites || [];
-            if (!blockedSites.includes(cleanUrl)) {
-                blockedSites.push(cleanUrl);
+            const siteIndex = blockedSites.findIndex(site => site.url === cleanUrl);
+
+            if (siteIndex === -1) {
+                blockedSites.push({ url: cleanUrl, count: 0 });
                 chrome.storage.local.set({ blockedSites: blockedSites }, updateBlockedList);
             }
             document.getElementById('website-input').value = '';
