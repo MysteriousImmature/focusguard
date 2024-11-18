@@ -1,37 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FocusGuard</title>
-    <link rel="stylesheet" href="popup.css">
-</head>
-<body>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
     <div class="container">
-        <h1>FocusGuard</h1>
+      <h1>FocusGuard</h1>
 
-        <div class="input-group">
-            <input type="text" id="website-input" placeholder="Enter website URL" />
-        </div>
-        <div class="button-group">
-            <button id="add-website">Block</button>
-        </div>
+      <div class="input-group">
+        <input type="text" id="website-input" placeholder="Enter website URL" />
+      </div>
+      <div class="button-group">
+        <button id="add-website">Block</button>
+      </div>
 
-        <h2>Common Social Media</h2>
-        <ul id="predefined-list">
-            <li><input type="checkbox" class="predefined-checkbox" data-url="reddit.com"> Reddit</li>
-            <li><input type="checkbox" class="predefined-checkbox" data-url="snapchat.com"> Snapchat</li>
-            <li><input type="checkbox" class="predefined-checkbox" data-url="facebook.com"> Facebook</li>
-            <li><input type="checkbox" class="predefined-checkbox" data-url="instagram.com"> Instagram</li>
-            <li><input type="checkbox" class="predefined-checkbox" data-url="x.com"> Twitter (X)</li>
-            <li><input type="checkbox" class="predefined-checkbox" data-url="youtube.com"> YouTube</li>
-            <li><input type="checkbox" class="predefined-checkbox" data-url="tiktok.com"> TikTok</li>
-        </ul>
+      <h2>Common Social Media</h2>
+      <ul id="predefined-list">
+        <li>
+          <input
+            type="checkbox"
+            class="predefined-checkbox"
+            data-url="reddit.com"
+          />
+          <p>
+            <span>Reddit</span>
+            <i class="fa-brands fa-reddit icon"></i>
+          </p>
+        </li>
+        <li>
+          <input
+            type="checkbox"
+            class="predefined-checkbox"
+            data-url="snapchat.com"
+          />
+          <p>
+            <span>Snapchat</span>
+            <i class="fa-brands fa-snapchat icon"></i>
+          </p>
+        </li>
+        <li>
+          <input
+            type="checkbox"
+            class="predefined-checkbox"
+            data-url="facebook.com"
+          />
+          <p>
+            <span>Facebook</span>
+            <i class="fa-brands fa-facebook icon"></i>
+          </p>
+        </li>
+        <li>
+          <input
+            type="checkbox"
+            class="predefined-checkbox"
+            data-url="instagram.com"
+          />
+          <p>
+            <span>Instagram</span>
+            <i class="fa-brands fa-instagram icon"></i>
+          </p>
+        </li>
+        <li>
+          <input type="checkbox" class="predefined-checkbox" data-url="x.com" />
+          <p>
+            <span>Twitter (X)</span>
+            <i class="fa-brands fa-x-twitter icon"></i>
+          </p>
+        </li>
+        <li>
+          <input
+            type="checkbox"
+            class="predefined-checkbox"
+            data-url="youtube.com"
+          />
+          <p>
+            <span>YouTube</span>
+            <i class="fa-brands fa-youtube icon"></i>
+          </p>
+        </li>
+        <li>
+          <input
+            type="checkbox"
+            class="predefined-checkbox"
+            data-url="tiktok.com"
+          />
+          <p>
+            <span>TikTok</span>
+            <i class="fa-brands fa-tiktok icon"></i>
+          </p>
+        </li>
+      </ul>
 
-        <h2>Blocked Websites</h2>
-        <ul id="blocked-list"></ul>
+      <h2>Blocked Websites</h2>
+      <ul id="blocked-list"></ul>
     </div>
 
     <script src="popup.js"></script>
-</body>
+  </body>
 </html>
