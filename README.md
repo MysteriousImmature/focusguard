@@ -13,5 +13,6 @@
 ## Contributing 🤝
 
 Contributions are welcome! If you have ideas or improvements, feel free to fork the repo and submit a pull request. For major changes, please open an issue first to discuss what you'd like to change.
-[Contributing Guidelines](CONTRIBUTING.md)
+[Contributing Guidelines](contribution.md)
+
 Stay focused and productive with **FocusGuard**! 🔒
