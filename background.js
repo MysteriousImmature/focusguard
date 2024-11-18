@@ -1,10 +1,12 @@
-// Initialize blocked sites array
 let blockedSites = [];
+let elapsedTime = 0;  // Total time spent on blocked sites (in seconds)
+let lastUpdateTime = Date.now();  // Track the last update time for saving elapsed time
 
-// Load blocked sites from storage
+// Load blocked sites from storage and previous elapsed time
 function loadBlockedSites() {
-    chrome.storage.local.get(['blockedSites'], function (result) {
+    chrome.storage.local.get(['blockedSites', 'elapsedTime'], function (result) {
         blockedSites = result.blockedSites || [];
+        elapsedTime = result.elapsedTime || 0;
         updateBlockingRules();
     });
 }
@@ -13,17 +15,14 @@ function loadBlockedSites() {
 function sanitizeUrlForPattern(url) {
     // Remove "http://" or "https://" if present
     url = url.replace(/^https?:\/\//, '');
-
-    // Ensure the URL doesn't start with "www." and add wildcard for subdomains
-    return `*://*.${url}/*`;
+    return `*://*.${url}/*`;  // Ensure subdomains are also blocked
 }
 
 // Update blocking rules based on the blocked sites
 function updateBlockingRules() {
-    // Map blocked sites to URL patterns
     const blockedPatterns = blockedSites.map(site => sanitizeUrlForPattern(site));
 
-    // Remove any previous listeners to avoid duplicates
+    // Remove previous listeners to avoid duplicates
     if (chrome.webRequest.onBeforeRequest.hasListener(blockRequest)) {
         chrome.webRequest.onBeforeRequest.removeListener(blockRequest);
     }
@@ -38,10 +37,19 @@ function updateBlockingRules() {
     }
 }
 
-// Block the request
+// Block the request and increment elapsed time
 function blockRequest(details) {
-    return { cancel: true };  // Cancel the request (block the site)
+    const currentTime = Date.now();
+    const timeBlocked = Math.round((currentTime - lastUpdateTime) / 1000);  // Time blocked in seconds
+    elapsedTime += timeBlocked;  // Add time blocked to the total elapsed time
+    lastUpdateTime = currentTime;  // Update the last update time to current time
+    return { cancel: true };  // Block the request
 }
+
+// Periodically update storage with the accumulated time (every 30 seconds)
+setInterval(function() {
+    chrome.storage.local.set({ elapsedTime: elapsedTime });
+}, 30000);  // Update every 30 seconds
 
 // Listen for changes to the blocked websites and update the rules
 chrome.storage.onChanged.addListener(function (changes, areaName) {
@@ -51,6 +59,6 @@ chrome.storage.onChanged.addListener(function (changes, areaName) {
     }
 });
 
-// Load the blocked sites when the extension starts
+// Load the blocked sites and elapsed time when the extension starts
 chrome.runtime.onStartup.addListener(loadBlockedSites);
 chrome.runtime.onInstalled.addListener(loadBlockedSites);
