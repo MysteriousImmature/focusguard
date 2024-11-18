@@ -1,4 +1,4 @@
-# Contributing to [Project Name]
+# Contributing to Focusguard
 
 Thank you for your interest in contributing! Follow these steps to get started:
 
