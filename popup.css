@@ -150,8 +150,12 @@ h2 {
   margin-right: 10px;
   transform: scale(1.1);
 }
-.icon {
-  margin-left: 3px;
+
+.social-icon {
+  width: 24px;
+  height: 24px;
+  margin-left: 10px;
+  vertical-align: middle;
 }
 
 /* Media Queries for Responsiveness */
