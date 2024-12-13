@@ -2,6 +2,10 @@
 
 **FocusGuard** is a simple yet powerful browser extension designed to help you stay focused by blocking distracting websites. Customize your block list and manage your online habits with ease, right from your browser.
 
+# Screenshots
+![Screenshot-1]/screenshots/laughlines-1.png)
+![Screenshot-2](/screenshots/laughlines-2.png)
+
 ## Features ✨
 
 - **Customizable Website Blocking**: Add or remove websites from your block list through an intuitive popup interface.
