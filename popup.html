@@ -8,70 +8,109 @@
   </head>
   <body>
     <div class="container">
-      <h1>FocusGuard</h1>
+      <header>
+        <div class="logo">
+          <img src="icons/icon48.png" alt="FocusGuard" class="logo-icon" />
+          <h1>FocusGuard</h1>
+        </div>
+        <p class="subtitle">Stay focused, block distractions</p>
+      </header>
 
-      <div class="input-group">
-        <input type="text" id="website-input" placeholder="Enter website URL" />
+      <div id="status-message" class="status"></div>
+
+      <div class="input-section">
+        <div class="input-group">
+          <input type="text" id="website-input" placeholder="Enter website URL (e.g., example.com)" />
+        </div>
+        <div class="button-group">
+          <button id="add-website">Block Website</button>
+        </div>
       </div>
-      <div class="button-group">
-        <button id="add-website">Block</button>
-      </div>
 
-      <h2>Common Social Media</h2>
-      <ul id="predefined-list">
-        <li>
-          <input type="checkbox" class="predefined-checkbox" data-url="reddit.com" />
-          <p>
-            <span>Reddit</span>
-            <img src="icons/reddit.svg" class="social-icon" alt="Reddit" />
-          </p>
-        </li>
-        <li>
-          <input type="checkbox" class="predefined-checkbox" data-url="snapchat.com" />
-          <p>
-            <span>Snapchat</span>
-            <img src="icons/snapchat.svg" class="social-icon" alt="Snapchat" />
-          </p>
-        </li>
-        <li>
-          <input type="checkbox" class="predefined-checkbox" data-url="facebook.com" />
-          <p>
-            <span>Facebook</span>
-            <img src="icons/facebook.svg" class="social-icon" alt="Facebook" />
-          </p>
-        </li>
-        <li>
-          <input type="checkbox" class="predefined-checkbox" data-url="instagram.com" />
-          <p>
-            <span>Instagram</span>
-            <img src="icons/instagram.svg" class="social-icon" alt="Instagram" />
-          </p>
-        </li>
-        <li>
-          <input type="checkbox" class="predefined-checkbox" data-url="x.com" />
-          <p>
-            <span>Twitter (X)</span>
-            <img src="icons/x.svg" class="social-icon" alt="Twitter (X)" />
-          </p>
-        </li>
-        <li>
-          <input type="checkbox" class="predefined-checkbox" data-url="youtube.com" />
-          <p>
-            <span>YouTube</span>
-            <img src="icons/youtube.svg" class="social-icon" alt="YouTube" />
-          </p>
-        </li>
-        <li>
-          <input type="checkbox" class="predefined-checkbox" data-url="tiktok.com" />
-          <p>
-            <span>TikTok</span>
-            <img src="icons/tiktok.svg" class="social-icon" alt="TikTok" />
-          </p>
-        </li>
-      </ul>
+      <section class="social-section">
+        <h2>Common Social Media</h2>
+        <ul id="predefined-list">
+          <li>
+            <input type="checkbox" class="predefined-checkbox" id="facebook" data-url="facebook.com" />
+            <label for="facebook">
+              <img src="icons/facebook.svg" class="social-icon" alt="Facebook" />
+              <span>Facebook</span>
+            </label>
+          </li>
+          <li>
+            <input type="checkbox" class="predefined-checkbox" id="youtube" data-url="youtube.com" />
+            <label for="youtube">
+              <img src="icons/youtube.svg" class="social-icon" alt="YouTube" />
+              <span>YouTube</span>
+            </label>
+          </li>
+          <li>
+            <input type="checkbox" class="predefined-checkbox" id="whatsapp" data-url="web.whatsapp.com" />
+            <label for="whatsapp">
+              <img src="icons/whatsapp.svg" class="social-icon" alt="WhatsApp" />
+              <span>WhatsApp</span>
+            </label>
+          </li>
+          <li>
+            <input type="checkbox" class="predefined-checkbox" id="instagram" data-url="instagram.com" />
+            <label for="instagram">
+              <img src="icons/instagram.svg" class="social-icon" alt="Instagram" />
+              <span>Instagram</span>
+            </label>
+          </li>
+          <li>
+            <input type="checkbox" class="predefined-checkbox" id="wechat" data-url="weixin.qq.com" />
+            <label for="wechat">
+              <img src="icons/wechat.svg" class="social-icon" alt="WeChat" />
+              <span>WeChat</span>
+            </label>
+          </li>
+          <li>
+            <input type="checkbox" class="predefined-checkbox" id="tiktok" data-url="tiktok.com" />
+            <label for="tiktok">
+              <img src="icons/tiktok.svg" class="social-icon" alt="TikTok" />
+              <span>TikTok</span>
+            </label>
+          </li>
+          <li>
+            <input type="checkbox" class="predefined-checkbox" id="twitter" data-url="x.com" />
+            <label for="twitter">
+              <img src="icons/x.svg" class="social-icon" alt="Twitter (X)" />
+              <span>Twitter (X)</span>
+            </label>
+          </li>
+          <li>
+            <input type="checkbox" class="predefined-checkbox" id="linkedin" data-url="linkedin.com" />
+            <label for="linkedin">
+              <img src="icons/linkedin.svg" class="social-icon" alt="LinkedIn" />
+              <span>LinkedIn</span>
+            </label>
+          </li>
+          <li>
+            <input type="checkbox" class="predefined-checkbox" id="pinterest" data-url="pinterest.com" />
+            <label for="pinterest">
+              <img src="icons/pinterest.svg" class="social-icon" alt="Pinterest" />
+              <span>Pinterest</span>
+            </label>
+          </li>
+          <li>
+            <input type="checkbox" class="predefined-checkbox" id="reddit" data-url="reddit.com" />
+            <label for="reddit">
+              <img src="icons/reddit.svg" class="social-icon" alt="Reddit" />
+              <span>Reddit</span>
+            </label>
+          </li>
+        </ul>
+      </section>
 
-      <h2>Blocked Websites</h2>
-      <ul id="blocked-list"></ul>
+      <section class="blocked-section">
+        <h2>Blocked Websites</h2>
+        <ul id="blocked-list"></ul>
+      </section>
+
+      <footer>
+        <p>FocusGuard v3.2.0</p>
+      </footer>
     </div>
 
     <script src="popup.js"></script>
