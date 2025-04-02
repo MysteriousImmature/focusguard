@@ -1,56 +1,88 @@
-// Initialize blocked sites array
+// Global variable to store blocked sites
 let blockedSites = [];
 
 // Load blocked sites from storage
 function loadBlockedSites() {
-    chrome.storage.local.get(['blockedSites'], function (result) {
+    browser.storage.local.get(['blockedSites'], function (result) {
+        if (browser.runtime.lastError) {
+            console.error("Error loading blocked sites:", browser.runtime.lastError);
+            return;
+        }
+        
         blockedSites = result.blockedSites || [];
         updateBlockingRules();
     });
 }
 
-// Sanitize the user's input to create a valid URL pattern
-function sanitizeUrlForPattern(url) {
-    // Remove "http://" or "https://" if present
-    url = url.replace(/^https?:\/\//, '');
-
-    // Ensure the URL doesn't start with "www." and add wildcard for subdomains
-    return `*://*.${url}/*`;
+// Validate and sanitize a domain for use in rules
+function isValidDomain(domain) {
+    // Basic domain validation pattern
+    return /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/.test(domain);
 }
 
-// Update blocking rules based on the blocked sites
-function updateBlockingRules() {
-    // Map blocked sites to URL patterns
-    const blockedPatterns = blockedSites.map(site => sanitizeUrlForPattern(site));
-
-    // Remove any previous listeners to avoid duplicates
-    if (chrome.webRequest.onBeforeRequest.hasListener(blockRequest)) {
-        chrome.webRequest.onBeforeRequest.removeListener(blockRequest);
+// Create URL pattern for blocking
+function createUrlPattern(domain) {
+    // Remove http/https and www if present
+    let cleanDomain = domain.replace(/^https?:\/\//, '').replace(/^www\./, '');
+    
+    // Remove any paths, queries or fragments to ensure we only have the domain
+    cleanDomain = cleanDomain.split('/')[0].split('?')[0].split('#')[0];
+    
+    // Log the domain processing for debugging
+    console.log(`Processing domain: ${domain} → cleaned to: ${cleanDomain}`);
+    
+    if (!isValidDomain(cleanDomain)) {
+        console.warn(`Invalid domain format: ${domain} (cleaned: ${cleanDomain})`);
+        return null;
     }
+    
+    // Create pattern matching both www and non-www versions
+    return `*://*.${cleanDomain}/*`;
+}
 
-    // Add listener to block the requests matching the user-defined websites
-    if (blockedPatterns.length > 0) {
-        chrome.webRequest.onBeforeRequest.addListener(
+// Update blocking rules based on blocked sites
+function updateBlockingRules() {
+    // Remove any previous listeners to avoid duplicates
+    if (browser.webRequest.onBeforeRequest.hasListener(blockRequest)) {
+        browser.webRequest.onBeforeRequest.removeListener(blockRequest);
+    }
+    
+    // Create URL patterns for all blocked sites
+    const urlPatterns = [];
+    
+    blockedSites.forEach(site => {
+        const pattern = createUrlPattern(site);
+        if (pattern) {
+            urlPatterns.push(pattern);
+        }
+    });
+    
+    // If we have patterns, add the blocking listener
+    if (urlPatterns.length > 0) {
+        browser.webRequest.onBeforeRequest.addListener(
             blockRequest,
-            { urls: blockedPatterns },
+            { urls: urlPatterns, types: ["main_frame"] },
             ["blocking"]
         );
     }
 }
 
-// Block the request
-function blockRequest(details) {
-    return { cancel: true };  // Cancel the request (block the site)
+// Function to block requests
+function blockRequest() {
+    return { cancel: true };
 }
 
-// Listen for changes to the blocked websites and update the rules
-chrome.storage.onChanged.addListener(function (changes, areaName) {
-    if (changes.blockedSites) {
+// Listen for changes to the blocked websites
+browser.storage.onChanged.addListener(function (changes, areaName) {
+    if (areaName === 'local' && changes.blockedSites) {
         blockedSites = changes.blockedSites.newValue || [];
         updateBlockingRules();
     }
 });
 
-// Load the blocked sites when the extension starts
-chrome.runtime.onStartup.addListener(loadBlockedSites);
-chrome.runtime.onInstalled.addListener(loadBlockedSites);
+// Initialize blocked sites on startup and installation
+browser.runtime.onStartup.addListener(loadBlockedSites);
+browser.runtime.onInstalled.addListener(loadBlockedSites);
+
+// Load settings immediately to ensure blocking works
+loadBlockedSites();
