@@ -33,7 +33,7 @@ body {
   color: var(--text-dark);
   margin: 0;
   padding: 20px;
-  width: 360px;
+  width: 450px;
   height: auto;
   display: flex;
   justify-content: center;
@@ -48,7 +48,7 @@ body {
   padding: 24px;
   box-shadow: var(--shadow-lg);
   width: 100%;
-  max-width: 360px;
+  max-width: 450px;
 }
 
 /* Header Styling */
@@ -292,21 +292,107 @@ footer p {
   font-size: 0.8em;
 }
 
-/* Media Queries for Responsiveness */
-@media (max-width: 360px) {
+/* Media Queries for Mobile */
+@media (max-width: 480px) {
   body {
+    width: 100%;
     padding: 16px;
+    height: auto;
+    min-height: 100vh;
   }
-
+  
   .container {
-    padding: 20px;
+    max-width: 100%;
+    padding: 18px;
+    box-shadow: none;
   }
-
+  
   h1 {
     font-size: 1.6em;
   }
   
   .button-group button {
-    padding: 10px 14px;
+    padding: 14px 16px; /* Increased touch target */
+    font-size: 1em;
   }
+  
+  .input-group input[type="text"] {
+    padding: 14px 16px; /* Increased touch target */
+    font-size: 1em;
+  }
+  
+  #predefined-list li {
+    padding: 12px 16px; /* Increased touch target */
+  }
+  
+  #predefined-list label {
+    padding: 6px; /* Increased touch target */
+  }
+  
+  .unblock-button {
+    padding: 10px 14px; /* Increased touch target */
+  }
+  
+  /* Improve touch targets for checkboxes */
+  #predefined-list input[type="checkbox"] {
+    min-width: 20px;
+    min-height: 20px;
+  }
+
+  /* Ensure better scrolling on mobile */
+  #blocked-list, #predefined-list {
+    max-height: none;
+    overflow-y: visible;
+  }
+}
+
+/* Firefox Android specific styles */
+@media (max-width: 480px) and (-moz-platform: android) {
+  body {
+    background: white; /* Simplify background for better performance */
+    font-size: 16px; /* More readable on small screens */
+  }
+  
+  .container {
+    border-radius: 0;
+  }
+  
+  /* Add some overscroll space for better UX */
+  body::after {
+    content: "";
+    display: block;
+    height: 50px;
+  }
+  
+  /* Increase contrast for better visibility */
+  .button-group button {
+    background: var(--primary-color);
+  }
+  
+  /* Make touch targets even larger for Firefox Android */
+  #predefined-list li,
+  .button-group button,
+  .input-group input[type="text"],
+  .unblock-button {
+    min-height: 48px; /* Google's recommended touch target size */
+  }
+}
+
+/* Touch-specific styling */
+.touch-active {
+  opacity: 0.7;
+  transform: scale(0.98);
+}
+
+/* For Android specific styling */
+body.android-device .button-group button {
+  min-height: 48px;
+}
+
+body.android-device .unblock-button {
+  min-height: 40px;
+}
+
+body.android-device #predefined-list input[type="checkbox"] {
+  transform: scale(1.2);
 }

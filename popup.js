@@ -12,6 +12,19 @@ const predefinedSites = [
     { name: 'Reddit', url: 'reddit.com' }
 ];
 
+// Flag to detect if we're on Android
+let isAndroid = false;
+
+// Detect platform for specific adjustments
+browser.runtime.getPlatformInfo().then(info => {
+    isAndroid = info.os === 'android';
+    if (isAndroid) {
+        document.body.classList.add('android-device');
+    }
+}).catch(error => {
+    console.error("Error detecting platform:", error);
+});
+
 // Display status message to user
 function showStatusMessage(message, isError = false) {
     const statusEl = document.getElementById('status-message');
@@ -161,6 +174,11 @@ function addBlockedSite() {
             document.getElementById('website-input').value = '';
             updateBlockedList();
             showStatusMessage(`${cleanUrl} has been blocked`);
+            
+            // On Android, blur the input field to hide keyboard
+            if (isAndroid) {
+                document.getElementById('website-input').blur();
+            }
         });
     });
 }
@@ -193,6 +211,10 @@ function removeBlockedSite(index) {
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
+    // Load blocked sites on popup open
+    updateBlockedList();
+    
+    // Button click event for adding sites
     document.getElementById('add-website').addEventListener('click', addBlockedSite);
     
     // Listen for Enter key in the input field
@@ -202,9 +224,37 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Add event listeners to predefined site checkboxes
     document.querySelectorAll('.predefined-checkbox').forEach(checkbox => {
         checkbox.addEventListener('change', togglePredefinedSite);
     });
     
-    updateBlockedList();
+    // Add touch-specific events for mobile
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        // Improve touch experience for checkboxes
+        document.querySelectorAll('.predefined-checkbox').forEach(checkbox => {
+            const label = document.querySelector(`label[for="${checkbox.id}"]`);
+            if (label) {
+                label.addEventListener('touchstart', function(e) {
+                    // Prevent the default touch behavior to avoid delay
+                    e.preventDefault();
+                    checkbox.checked = !checkbox.checked;
+                    // Manually trigger the change event
+                    const event = new Event('change');
+                    checkbox.dispatchEvent(event);
+                });
+            }
+        });
+        
+        // Add active state for buttons on touch
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.addEventListener('touchstart', function() {
+                this.classList.add('touch-active');
+            });
+            button.addEventListener('touchend', function() {
+                this.classList.remove('touch-active');
+            });
+        });
+    }
 });
