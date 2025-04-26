@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FocusGuard Options</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 16px;
+      color: #333;
+      background-color: #f9f9f9;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+    
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      margin-right: 12px;
+    }
+    
+    h1 {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+    
+    .subtitle {
+      font-size: 0.9rem;
+      margin: 0;
+      color: #666;
+    }
+    
+    .site-section {
+      background-color: white;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    h2 {
+      font-size: 1.2rem;
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: #444;
+    }
+    
+    .site-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .site-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .site-item:last-child {
+      border-bottom: none;
+    }
+    
+    .site-checkbox {
+      margin-right: 12px;
+    }
+    
+    .site-label {
+      display: flex;
+      align-items: center;
+      flex-grow: 1;
+      cursor: pointer;
+    }
+    
+    .site-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 12px;
+    }
+    
+    .custom-section {
+      background-color: white;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .input-group {
+      display: flex;
+      margin-bottom: 16px;
+    }
+    
+    #website-input {
+      flex-grow: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    
+    #add-website {
+      padding: 10px 16px;
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      margin-left: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    #add-website:hover {
+      background-color: #4338ca;
+    }
+    
+    .blocked-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .blocked-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .blocked-item:last-child {
+      border-bottom: none;
+    }
+    
+    .site-url {
+      font-size: 0.9rem;
+    }
+    
+    .unblock-button {
+      background-color: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .unblock-button:hover {
+      background-color: #dc2626;
+    }
+    
+    .empty-message {
+      color: #666;
+      font-style: italic;
+      text-align: center;
+      padding: 16px 0;
+    }
+    
+    .button-container {
+      margin-top: 24px;
+      display: flex;
+      justify-content: center;
+    }
+    
+    #save-button {
+      padding: 12px 24px;
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    #save-button:hover {
+      background-color: #4338ca;
+    }
+    
+    .status {
+      text-align: center;
+      padding: 12px;
+      margin-bottom: 16px;
+      border-radius: 4px;
+      display: none;
+    }
+    
+    .success {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    
+    .error {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+    
+    /* Mobile-specific adjustments */
+    @media (max-width: 600px) {
+      body {
+        padding: 12px;
+      }
+      
+      .site-section, .custom-section {
+        padding: 12px;
+      }
+      
+      .input-group {
+        flex-direction: column;
+      }
+      
+      #website-input {
+        margin-bottom: 8px;
+      }
+      
+      #add-website {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="icons/icon48.png" alt="FocusGuard" class="logo-icon">
+      <div>
+        <h1>FocusGuard Options</h1>
+        <p class="subtitle">Configure your distraction blocking settings</p>
+      </div>
+    </div>
+  </header>
+
+  <div id="status-message" class="status"></div>
+
+  <section class="site-section">
+    <h2>Block Social Media Sites</h2>
+    <ul class="site-list" id="predefined-list">
+      <li class="site-item">
+        <input type="checkbox" class="site-checkbox" id="facebook" data-url="facebook.com">
+        <label for="facebook" class="site-label">
+          <img src="icons/facebook.svg" class="site-icon" alt="Facebook">
+          <span>Facebook</span>
+        </label>
+      </li>
+      <li class="site-item">
+        <input type="checkbox" class="site-checkbox" id="youtube" data-url="youtube.com">
+        <label for="youtube" class="site-label">
+          <img src="icons/youtube.svg" class="site-icon" alt="YouTube">
+          <span>YouTube</span>
+        </label>
+      </li>
+      <li class="site-item">
+        <input type="checkbox" class="site-checkbox" id="whatsapp" data-url="web.whatsapp.com">
+        <label for="whatsapp" class="site-label">
+          <img src="icons/whatsapp.svg" class="site-icon" alt="WhatsApp">
+          <span>WhatsApp</span>
+        </label>
+      </li>
+      <li class="site-item">
+        <input type="checkbox" class="site-checkbox" id="instagram" data-url="instagram.com">
+        <label for="instagram" class="site-label">
+          <img src="icons/instagram.svg" class="site-icon" alt="Instagram">
+          <span>Instagram</span>
+        </label>
+      </li>
+      <li class="site-item">
+        <input type="checkbox" class="site-checkbox" id="wechat" data-url="weixin.qq.com">
+        <label for="wechat" class="site-label">
+          <img src="icons/wechat.svg" class="site-icon" alt="WeChat">
+          <span>WeChat</span>
+        </label>
+      </li>
+      <li class="site-item">
+        <input type="checkbox" class="site-checkbox" id="tiktok" data-url="tiktok.com">
+        <label for="tiktok" class="site-label">
+          <img src="icons/tiktok.svg" class="site-icon" alt="TikTok">
+          <span>TikTok</span>
+        </label>
+      </li>
+      <li class="site-item">
+        <input type="checkbox" class="site-checkbox" id="twitter" data-url="x.com">
+        <label for="twitter" class="site-label">
+          <img src="icons/x.svg" class="site-icon" alt="Twitter (X)">
+          <span>Twitter (X)</span>
+        </label>
+      </li>
+      <li class="site-item">
+        <input type="checkbox" class="site-checkbox" id="linkedin" data-url="linkedin.com">
+        <label for="linkedin" class="site-label">
+          <img src="icons/linkedin.svg" class="site-icon" alt="LinkedIn">
+          <span>LinkedIn</span>
+        </label>
+      </li>
+      <li class="site-item">
+        <input type="checkbox" class="site-checkbox" id="pinterest" data-url="pinterest.com">
+        <label for="pinterest" class="site-label">
+          <img src="icons/pinterest.svg" class="site-icon" alt="Pinterest">
+          <span>Pinterest</span>
+        </label>
+      </li>
+      <li class="site-item">
+        <input type="checkbox" class="site-checkbox" id="reddit" data-url="reddit.com">
+        <label for="reddit" class="site-label">
+          <img src="icons/reddit.svg" class="site-icon" alt="Reddit">
+          <span>Reddit</span>
+        </label>
+      </li>
+    </ul>
+  </section>
+
+  <section class="custom-section">
+    <h2>Add Custom Website</h2>
+    <div class="input-group">
+      <input type="text" id="website-input" placeholder="Enter website URL (e.g., example.com)">
+      <button id="add-website">Add</button>
+    </div>
+    <h2>Custom Blocked Websites</h2>
+    <ul id="blocked-list" class="blocked-list"></ul>
+  </section>
+
+  <div class="button-container">
+    <button id="save-button">Save Settings</button>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html> 

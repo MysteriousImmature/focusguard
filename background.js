@@ -6,6 +6,16 @@ let isAndroid = false;
 browser.runtime.getPlatformInfo().then(info => {
     isAndroid = info.os === 'android';
     console.log("Running on platform:", info.os);
+    
+    // For Android devices, we'll set browser action to open options page instead of popup
+    if (isAndroid) {
+        browser.browserAction.setPopup({ popup: "" });
+        
+        // Add listener for browserAction clicks to open options page
+        browser.browserAction.onClicked.addListener(() => {
+            browser.runtime.openOptionsPage();
+        });
+    }
 }).catch(error => {
     console.error("Error detecting platform:", error);
 });
