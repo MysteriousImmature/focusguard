@@ -4,115 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FocusGuard Options</title>
+
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Arial, sans-serif;
       padding: 16px;
       color: #333;
       background-color: #f9f9f9;
       max-width: 800px;
       margin: 0 auto;
     }
-    
+
     header {
       display: flex;
       align-items: center;
       margin-bottom: 24px;
     }
-    
+
     .logo {
       display: flex;
       align-items: center;
     }
-    
+
     .logo-icon {
       width: 32px;
       height: 32px;
       margin-right: 12px;
     }
-    
+
     h1 {
       font-size: 1.5rem;
       margin: 0;
     }
-    
+
     .subtitle {
       font-size: 0.9rem;
       margin: 0;
       color: #666;
     }
-    
-    .site-section {
-      background-color: white;
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 20px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-    
+
     h2 {
       font-size: 1.2rem;
       margin-top: 0;
       margin-bottom: 16px;
       color: #444;
     }
-    
-    .site-list {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-    }
-    
-    .site-item {
-      display: flex;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-    }
-    
-    .site-item:last-child {
-      border-bottom: none;
-    }
-    
-    .site-checkbox {
-      margin-right: 12px;
-    }
-    
-    .site-label {
-      display: flex;
-      align-items: center;
-      flex-grow: 1;
-      cursor: pointer;
-    }
-    
-    .site-icon {
-      width: 24px;
-      height: 24px;
-      margin-right: 12px;
-    }
-    
-    .custom-section {
+
+    .site-section,
+    .custom-section,
+    .dashboard {
       background-color: white;
       border-radius: 8px;
       padding: 16px;
       margin-bottom: 20px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
-    
+
+    .site-list,
+    .blocked-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .site-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .site-item:last-child,
+    .blocked-item:last-child {
+      border-bottom: none;
+    }
+
+    .site-checkbox {
+      margin-right: 12px;
+    }
+
+    .site-label {
+      display: flex;
+      align-items: center;
+      flex-grow: 1;
+      cursor: pointer;
+    }
+
+    .site-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 12px;
+    }
+
     .input-group {
       display: flex;
       margin-bottom: 16px;
     }
-    
+
     #website-input {
       flex-grow: 1;
+      min-width: 0;
       padding: 10px;
       border: 1px solid #ddd;
       border-radius: 4px;
       font-size: 16px;
     }
-    
+
     #add-website {
       padding: 10px 16px;
       background-color: #4f46e5;
@@ -123,17 +121,12 @@
       cursor: pointer;
       font-size: 16px;
     }
-    
-    #add-website:hover {
+
+    #add-website:hover,
+    #save-button:hover {
       background-color: #4338ca;
     }
-    
-    .blocked-list {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-    }
-    
+
     .blocked-item {
       display: flex;
       justify-content: space-between;
@@ -141,15 +134,13 @@
       padding: 10px 0;
       border-bottom: 1px solid #eee;
     }
-    
-    .blocked-item:last-child {
-      border-bottom: none;
-    }
-    
+
     .site-url {
       font-size: 0.9rem;
+      overflow-wrap: anywhere;
+      min-width: 0;
     }
-    
+
     .unblock-button {
       background-color: #ef4444;
       color: white;
@@ -158,25 +149,27 @@
       padding: 6px 12px;
       cursor: pointer;
       font-size: 14px;
+      flex-shrink: 0;
+      margin-left: 8px;
     }
-    
+
     .unblock-button:hover {
       background-color: #dc2626;
     }
-    
+
     .empty-message {
       color: #666;
       font-style: italic;
       text-align: center;
       padding: 16px 0;
     }
-    
+
     .button-container {
       margin-top: 24px;
       display: flex;
       justify-content: center;
     }
-    
+
     #save-button {
       padding: 12px 24px;
       background-color: #4f46e5;
@@ -187,11 +180,7 @@
       font-size: 16px;
       font-weight: 500;
     }
-    
-    #save-button:hover {
-      background-color: #4338ca;
-    }
-    
+
     .status {
       text-align: center;
       padding: 12px;
@@ -199,41 +188,153 @@
       border-radius: 4px;
       display: none;
     }
-    
+
     .success {
       background-color: #d1fae5;
       color: #065f46;
     }
-    
+
     .error {
       background-color: #fee2e2;
       color: #b91c1c;
     }
-    
-    /* Mobile-specific adjustments */
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat-card {
+      padding: 14px 10px;
+      background: #e0e7ff;
+      border-radius: 10px;
+    }
+
+    .stat-card strong {
+      display: block;
+      font-size: 1.5em;
+      color: #4338ca;
+      overflow-wrap: anywhere;
+    }
+
+    .stat-card span {
+      display: block;
+      font-size: 0.85em;
+      color: #4b5563;
+    }
+
+    .stats-note {
+      font-size: 0.8em;
+      color: #6b7280;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .focus-session {
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+    }
+
+    .focus-session h3 {
+      font-size: 1em;
+      margin-top: 0;
+      margin-bottom: 6px;
+    }
+
+    .session-progress-label {
+      display: block;
+      font-size: 0.85em;
+      margin-top: 10px;
+    }
+
+    #session-progress {
+      display: block;
+      width: 100%;
+      height: 14px;
+      margin: 6px 0;
+      accent-color: #4f46e5;
+    }
+
+    #session-progress::-moz-progress-bar {
+      background: #4f46e5;
+    }
+
+    #session-remaining {
+      font-size: 0.85em;
+      color: #4b5563;
+      line-height: 1.5;
+    }
+
+    .session-controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    #session-duration {
+      box-sizing: border-box;
+      width: 65px;
+      padding: 8px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    .session-controls button {
+      min-height: 48px;
+      padding: 10px 12px;
+      border: 0;
+      border-radius: 6px;
+      background: #4f46e5;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .session-controls button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .session-controls [hidden] {
+      display: none;
+    }
+
+    .session-controls :focus-visible {
+      outline: 2px solid #4338ca;
+      outline-offset: 3px;
+    }
+
     @media (max-width: 600px) {
       body {
         padding: 12px;
       }
-      
-      .site-section, .custom-section {
+
+      .site-section,
+      .custom-section {
         padding: 12px;
       }
-      
+
       .input-group {
         flex-direction: column;
       }
-      
+
       #website-input {
         margin-bottom: 8px;
       }
-      
+
       #add-website {
         margin-left: 0;
       }
     }
   </style>
 </head>
+
 <body>
   <header>
     <div class="logo">
@@ -247,88 +348,164 @@
 
   <div id="status-message" class="status"></div>
 
+  <section class="dashboard" aria-labelledby="dashboard-title">
+    <h2 id="dashboard-title">Your productivity</h2>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <strong id="blocked-attempts">0</strong>
+        <span>Blocked attempts</span>
+      </div>
+
+      <div class="stat-card">
+        <strong id="time-saved">0 min</strong>
+        <span>Estimated time saved</span>
+      </div>
+    </div>
+
+    <p class="stats-note">
+      All-time totals · Estimate: 5 minutes per blocked attempt.
+    </p>
+
+    <div class="focus-session">
+      <h3>Focus session</h3>
+      <p id="session-status" role="status">Ready to focus</p>
+
+      <label for="session-progress" class="session-progress-label">
+        Session progress
+      </label>
+      <progress id="session-progress" max="100" value="0">0%</progress>
+
+      <p id="session-remaining">
+        Choose a duration and start your session.
+      </p>
+
+      <div class="session-controls">
+        <label for="session-duration">Minutes</label>
+        <input
+          id="session-duration"
+          type="number"
+          min="1"
+          max="180"
+          step="1"
+          value="25"
+        >
+        <button id="start-session" type="button">Start focus</button>
+        <button id="end-session" type="button" hidden>End session</button>
+      </div>
+
+      <p class="stats-note">
+        Website blocking stays active independently of the timer.
+      </p>
+    </div>
+  </section>
+
   <section class="site-section">
     <h2>Block Social Media Sites</h2>
+
     <ul class="site-list" id="predefined-list">
       <li class="site-item">
-        <input type="checkbox" class="site-checkbox" id="facebook" data-url="facebook.com">
+        <input type="checkbox" class="site-checkbox"
+          id="facebook" data-url="facebook.com">
         <label for="facebook" class="site-label">
           <img src="icons/facebook.svg" class="site-icon" alt="Facebook">
           <span>Facebook</span>
         </label>
       </li>
+
       <li class="site-item">
-        <input type="checkbox" class="site-checkbox" id="youtube" data-url="youtube.com">
+        <input type="checkbox" class="site-checkbox"
+          id="youtube" data-url="youtube.com">
         <label for="youtube" class="site-label">
           <img src="icons/youtube.svg" class="site-icon" alt="YouTube">
           <span>YouTube</span>
         </label>
       </li>
+
       <li class="site-item">
-        <input type="checkbox" class="site-checkbox" id="whatsapp" data-url="web.whatsapp.com">
+        <input type="checkbox" class="site-checkbox"
+          id="whatsapp" data-url="web.whatsapp.com">
         <label for="whatsapp" class="site-label">
           <img src="icons/whatsapp.svg" class="site-icon" alt="WhatsApp">
           <span>WhatsApp</span>
         </label>
       </li>
+
       <li class="site-item">
-        <input type="checkbox" class="site-checkbox" id="instagram" data-url="instagram.com">
+        <input type="checkbox" class="site-checkbox"
+          id="instagram" data-url="instagram.com">
         <label for="instagram" class="site-label">
           <img src="icons/instagram.svg" class="site-icon" alt="Instagram">
           <span>Instagram</span>
         </label>
       </li>
+
       <li class="site-item">
-        <input type="checkbox" class="site-checkbox" id="wechat" data-url="weixin.qq.com">
+        <input type="checkbox" class="site-checkbox"
+          id="wechat" data-url="weixin.qq.com">
         <label for="wechat" class="site-label">
           <img src="icons/wechat.svg" class="site-icon" alt="WeChat">
           <span>WeChat</span>
         </label>
       </li>
+
       <li class="site-item">
-        <input type="checkbox" class="site-checkbox" id="tiktok" data-url="tiktok.com">
+        <input type="checkbox" class="site-checkbox"
+          id="tiktok" data-url="tiktok.com">
         <label for="tiktok" class="site-label">
           <img src="icons/tiktok.svg" class="site-icon" alt="TikTok">
           <span>TikTok</span>
         </label>
       </li>
+
       <li class="site-item">
-        <input type="checkbox" class="site-checkbox" id="twitter" data-url="x.com">
+        <input type="checkbox" class="site-checkbox"
+          id="twitter" data-url="x.com">
         <label for="twitter" class="site-label">
           <img src="icons/x.svg" class="site-icon" alt="Twitter (X)">
           <span>Twitter (X)</span>
         </label>
       </li>
+
       <li class="site-item">
-        <input type="checkbox" class="site-checkbox" id="linkedin" data-url="linkedin.com">
+        <input type="checkbox" class="site-checkbox"
+          id="linkedin" data-url="linkedin.com">
         <label for="linkedin" class="site-label">
           <img src="icons/linkedin.svg" class="site-icon" alt="LinkedIn">
           <span>LinkedIn</span>
         </label>
       </li>
+
       <li class="site-item">
-        <input type="checkbox" class="site-checkbox" id="pinterest" data-url="pinterest.com">
+        <input type="checkbox" class="site-checkbox"
+          id="pinterest" data-url="pinterest.com">
         <label for="pinterest" class="site-label">
           <img src="icons/pinterest.svg" class="site-icon" alt="Pinterest">
           <span>Pinterest</span>
         </label>
       </li>
+
       <li class="site-item">
-        <input type="checkbox" class="site-checkbox" id="reddit" data-url="reddit.com">
+        <input type="checkbox" class="site-checkbox"
+          id="reddit" data-url="reddit.com">
         <label for="reddit" class="site-label">
           <img src="icons/reddit.svg" class="site-icon" alt="Reddit">
           <span>Reddit</span>
         </label>
       </li>
+
       <li class="site-item">
-        <input type="checkbox" class="site-checkbox" id="bluesky" data-url="bsky.app">
+        <input type="checkbox" class="site-checkbox"
+          id="bluesky" data-url="bsky.app">
         <label for="bluesky" class="site-label">
           <img src="icons/bsky.svg" class="site-icon" alt="Bluesky">
           <span>Bluesky</span>
         </label>
       </li>
+
       <li class="site-item">
-        <input type="checkbox" class="site-checkbox" id="discord" data-url="discord.com">
+        <input type="checkbox" class="site-checkbox"
+          id="discord" data-url="discord.com">
         <label for="discord" class="site-label">
           <img src="icons/discord.svg" class="site-icon" alt="Discord">
           <span>Discord</span>
@@ -339,10 +516,16 @@
 
   <section class="custom-section">
     <h2>Add Custom Website</h2>
+
     <div class="input-group">
-      <input type="text" id="website-input" placeholder="Enter website URL (e.g., example.com)">
+      <input
+        type="text"
+        id="website-input"
+        placeholder="Enter website URL (e.g., example.com)"
+      >
       <button id="add-website">Add</button>
     </div>
+
     <h2>Custom Blocked Websites</h2>
     <ul id="blocked-list" class="blocked-list"></ul>
   </section>
@@ -353,4 +536,4 @@
 
   <script src="options.js"></script>
 </body>
-</html> 
+</html>

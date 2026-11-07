@@ -18,9 +18,65 @@
 
       <div id="status-message" class="status"></div>
 
+      <section class="dashboard" aria-labelledby="dashboard-title">
+        <h2 id="dashboard-title">Your productivity</h2>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <strong id="blocked-attempts">0</strong>
+            <span>Blocked attempts</span>
+          </div>
+
+          <div class="stat-card">
+            <strong id="time-saved">0 min</strong>
+            <span>Estimated time saved</span>
+          </div>
+        </div>
+
+        <p class="stats-note">
+          All-time totals · Estimate: 5 minutes per blocked attempt.
+        </p>
+
+        <div class="focus-session">
+          <h3>Focus session</h3>
+          <p id="session-status" role="status">Ready to focus</p>
+
+          <label for="session-progress" class="session-progress-label">
+            Session progress
+          </label>
+          <progress id="session-progress" max="100" value="0">0%</progress>
+
+          <p id="session-remaining">
+            Choose a duration and start your session.
+          </p>
+
+          <div class="session-controls">
+            <label for="session-duration">Minutes</label>
+            <input
+              id="session-duration"
+              type="number"
+              min="1"
+              max="180"
+              step="1"
+              value="25"
+            />
+            <button id="start-session" type="button">Start focus</button>
+            <button id="end-session" type="button" hidden>End session</button>
+          </div>
+
+          <p class="stats-note">
+            Website blocking stays active independently of the timer.
+          </p>
+        </div>
+      </section>
+
       <div class="input-section">
         <div class="input-group">
-          <input type="text" id="website-input" placeholder="Enter website URL (e.g., example.com)" />
+          <input
+            type="text"
+            id="website-input"
+            placeholder="Enter website URL (e.g., example.com)"
+          />
         </div>
         <div class="button-group">
           <button id="add-website">Block Website</button>
@@ -31,86 +87,194 @@
         <h2>Common Social Media</h2>
         <ul id="predefined-list">
           <li>
-            <input type="checkbox" class="predefined-checkbox" id="facebook" data-url="facebook.com" />
+            <input
+              type="checkbox"
+              class="predefined-checkbox"
+              id="facebook"
+              data-url="facebook.com"
+            />
             <label for="facebook">
-              <img src="icons/facebook.svg" class="social-icon" alt="Facebook" />
+              <img
+                src="icons/facebook.svg"
+                class="social-icon"
+                alt="Facebook"
+              />
               <span>Facebook</span>
             </label>
           </li>
           <li>
-            <input type="checkbox" class="predefined-checkbox" id="youtube" data-url="youtube.com" />
+            <input
+              type="checkbox"
+              class="predefined-checkbox"
+              id="youtube"
+              data-url="youtube.com"
+            />
             <label for="youtube">
-              <img src="icons/youtube.svg" class="social-icon" alt="YouTube" />
+              <img
+                src="icons/youtube.svg"
+                class="social-icon"
+                alt="YouTube"
+              />
               <span>YouTube</span>
             </label>
           </li>
           <li>
-            <input type="checkbox" class="predefined-checkbox" id="whatsapp" data-url="web.whatsapp.com" />
+            <input
+              type="checkbox"
+              class="predefined-checkbox"
+              id="whatsapp"
+              data-url="web.whatsapp.com"
+            />
             <label for="whatsapp">
-              <img src="icons/whatsapp.svg" class="social-icon" alt="WhatsApp" />
+              <img
+                src="icons/whatsapp.svg"
+                class="social-icon"
+                alt="WhatsApp"
+              />
               <span>WhatsApp</span>
             </label>
           </li>
           <li>
-            <input type="checkbox" class="predefined-checkbox" id="instagram" data-url="instagram.com" />
+            <input
+              type="checkbox"
+              class="predefined-checkbox"
+              id="instagram"
+              data-url="instagram.com"
+            />
             <label for="instagram">
-              <img src="icons/instagram.svg" class="social-icon" alt="Instagram" />
+              <img
+                src="icons/instagram.svg"
+                class="social-icon"
+                alt="Instagram"
+              />
               <span>Instagram</span>
             </label>
           </li>
           <li>
-            <input type="checkbox" class="predefined-checkbox" id="wechat" data-url="weixin.qq.com" />
+            <input
+              type="checkbox"
+              class="predefined-checkbox"
+              id="wechat"
+              data-url="weixin.qq.com"
+            />
             <label for="wechat">
-              <img src="icons/wechat.svg" class="social-icon" alt="WeChat" />
+              <img
+                src="icons/wechat.svg"
+                class="social-icon"
+                alt="WeChat"
+              />
               <span>WeChat</span>
             </label>
           </li>
           <li>
-            <input type="checkbox" class="predefined-checkbox" id="tiktok" data-url="tiktok.com" />
+            <input
+              type="checkbox"
+              class="predefined-checkbox"
+              id="tiktok"
+              data-url="tiktok.com"
+            />
             <label for="tiktok">
-              <img src="icons/tiktok.svg" class="social-icon" alt="TikTok" />
+              <img
+                src="icons/tiktok.svg"
+                class="social-icon"
+                alt="TikTok"
+              />
               <span>TikTok</span>
             </label>
           </li>
           <li>
-            <input type="checkbox" class="predefined-checkbox" id="twitter" data-url="x.com" />
+            <input
+              type="checkbox"
+              class="predefined-checkbox"
+              id="twitter"
+              data-url="x.com"
+            />
             <label for="twitter">
-              <img src="icons/x.svg" class="social-icon" alt="Twitter (X)" />
+              <img
+                src="icons/x.svg"
+                class="social-icon"
+                alt="Twitter (X)"
+              />
               <span>Twitter (X)</span>
             </label>
           </li>
           <li>
-            <input type="checkbox" class="predefined-checkbox" id="linkedin" data-url="linkedin.com" />
+            <input
+              type="checkbox"
+              class="predefined-checkbox"
+              id="linkedin"
+              data-url="linkedin.com"
+            />
             <label for="linkedin">
-              <img src="icons/linkedin.svg" class="social-icon" alt="LinkedIn" />
+              <img
+                src="icons/linkedin.svg"
+                class="social-icon"
+                alt="LinkedIn"
+              />
               <span>LinkedIn</span>
             </label>
           </li>
           <li>
-            <input type="checkbox" class="predefined-checkbox" id="pinterest" data-url="pinterest.com" />
+            <input
+              type="checkbox"
+              class="predefined-checkbox"
+              id="pinterest"
+              data-url="pinterest.com"
+            />
             <label for="pinterest">
-              <img src="icons/pinterest.svg" class="social-icon" alt="Pinterest" />
+              <img
+                src="icons/pinterest.svg"
+                class="social-icon"
+                alt="Pinterest"
+              />
               <span>Pinterest</span>
             </label>
           </li>
           <li>
-            <input type="checkbox" class="predefined-checkbox" id="reddit" data-url="reddit.com" />
+            <input
+              type="checkbox"
+              class="predefined-checkbox"
+              id="reddit"
+              data-url="reddit.com"
+            />
             <label for="reddit">
-              <img src="icons/reddit.svg" class="social-icon" alt="Reddit" />
+              <img
+                src="icons/reddit.svg"
+                class="social-icon"
+                alt="Reddit"
+              />
               <span>Reddit</span>
             </label>
           </li>
           <li>
-            <input type="checkbox" class="predefined-checkbox" id="bluesky" data-url="bsky.app" />
+            <input
+              type="checkbox"
+              class="predefined-checkbox"
+              id="bluesky"
+              data-url="bsky.app"
+            />
             <label for="bluesky">
-              <img src="icons/bsky.svg" class="social-icon" alt="Bluesky" />
+              <img
+                src="icons/bsky.svg"
+                class="social-icon"
+                alt="Bluesky"
+              />
               <span>Bluesky</span>
             </label>
           </li>
           <li>
-            <input type="checkbox" class="predefined-checkbox" id="discord" data-url="discord.com" />
+            <input
+              type="checkbox"
+              class="predefined-checkbox"
+              id="discord"
+              data-url="discord.com"
+            />
             <label for="discord">
-              <img src="icons/discord.svg" class="social-icon" alt="Discord" />
+              <img
+                src="icons/discord.svg"
+                class="social-icon"
+                alt="Discord"
+              />
               <span>Discord</span>
             </label>
           </li>

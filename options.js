@@ -1,7 +1,5 @@
-// Flag to detect if we're on Android
 let isAndroid = false;
 
-// Initialize predefined sites for easy reference
 const predefinedSites = [
     { name: 'Facebook', url: 'facebook.com' },
     { name: 'YouTube', url: 'youtube.com' },
@@ -17,96 +15,90 @@ const predefinedSites = [
     { name: 'Discord', url: 'discord.com' }
 ];
 
-// Detect platform for specific adjustments
-browser.runtime.getPlatformInfo().then(info => {
-    isAndroid = info.os === 'android';
-    console.log("Running on platform:", info.os);
-    
-    // If on Android, automatically check all social media sites
-    if (isAndroid) {
-        document.body.classList.add('android-device');
-        
-        // First load saved settings to avoid overwriting other custom sites
-        browser.storage.local.get(['blockedSites'], function(result) {
-            let blockedSites = result.blockedSites || [];
-            
-            // Add all predefined sites to blocked list if not already present
-            predefinedSites.forEach(site => {
-                if (!blockedSites.includes(site.url)) {
-                    blockedSites.push(site.url);
-                }
-            });
-            
-            // Save the updated blocked sites
-            browser.storage.local.set({ blockedSites: blockedSites }, function() {
-                if (browser.runtime.lastError) {
-                    console.error("Error saving blocked sites:", browser.runtime.lastError);
-                    showStatusMessage("Failed to save settings", true);
-                    return;
-                }
-                updateUIFromSettings();
-                showStatusMessage("Default social sites blocked on Android");
-            });
-        });
-    } else {
-        // Regular behavior for desktop - just load saved settings
-        updateUIFromSettings();
-    }
-}).catch(error => {
-    console.error("Error detecting platform:", error);
-    // Default to desktop behavior if detection fails
-    updateUIFromSettings();
-});
+// Initialize defaults once without overwriting existing user choices.
+async function initializePlatform() {
+    try {
+        const info = await browser.runtime.getPlatformInfo();
+        isAndroid = info.os === 'android';
 
-// Display status message to user
+        if (isAndroid) {
+            document.body.classList.add('android-device');
+
+            const saved = await browser.storage.local.get([
+                'blockedSites',
+                'androidDefaultsInitialized'
+            ]);
+
+            if (!saved.androidDefaultsInitialized) {
+                const updates = {
+                    androidDefaultsInitialized: true
+                };
+
+                // An existing empty list also represents a user choice.
+                if (!Array.isArray(saved.blockedSites)) {
+                    updates.blockedSites = predefinedSites.map(
+                        site => site.url
+                    );
+                }
+
+                await browser.storage.local.set(updates);
+            }
+        }
+    } catch (error) {
+        console.error("Could not initialize platform settings:", error);
+        showStatusMessage("Could not load platform settings.", true);
+    }
+
+    updateUIFromSettings();
+}
+
 function showStatusMessage(message, isError = false) {
     const statusEl = document.getElementById('status-message');
     if (!statusEl) return;
-    
+
     statusEl.textContent = message;
     statusEl.className = isError ? 'status error' : 'status success';
     statusEl.style.display = 'block';
-    
+
     setTimeout(() => {
         statusEl.style.display = 'none';
     }, 3000);
 }
 
-// Update UI checkboxes and lists based on saved settings
 function updateUIFromSettings() {
-    browser.storage.local.get(['blockedSites'], function(result) {
+    browser.storage.local.get(['blockedSites'], function (result) {
         if (browser.runtime.lastError) {
-            console.error("Error loading blocked sites:", browser.runtime.lastError);
+            console.error(
+                "Error loading blocked sites:",
+                browser.runtime.lastError
+            );
             showStatusMessage("Failed to load settings", true);
             return;
         }
-        
+
         const blockedSites = result.blockedSites || [];
-        
-        // Update predefined checkboxes
+
         document.querySelectorAll('.site-checkbox').forEach(checkbox => {
             const siteUrl = checkbox.getAttribute('data-url');
             checkbox.checked = blockedSites.includes(siteUrl);
         });
-        
-        // Update custom blocked sites list
+
         updateBlockedList(blockedSites);
     });
 }
 
-// Update the custom blocked sites list
 function updateBlockedList(blockedSites) {
     const listElement = document.getElementById('blocked-list');
-    listElement.innerHTML = ''; // Clear current list
-    
-    // Get all predefined site URLs
-    const predefinedUrls = Array.from(document.querySelectorAll('.site-checkbox')).map(
-        checkbox => checkbox.getAttribute('data-url')
+    listElement.innerHTML = '';
+
+    const predefinedUrls = Array.from(
+        document.querySelectorAll('.site-checkbox')
+    ).map(checkbox => checkbox.getAttribute('data-url'));
+
+    const customSites = blockedSites.filter(
+        site => !predefinedUrls.includes(site)
     );
-    
-    // Filter to show only custom sites (not in predefined list)
-    const customSites = blockedSites.filter(site => !predefinedUrls.includes(site));
-    
+
     if (customSites.length === 0) {
         const emptyMessage = document.createElement('p');
         emptyMessage.className = 'empty-message';
@@ -114,83 +106,75 @@ function updateBlockedList(blockedSites) {
         listElement.appendChild(emptyMessage);
         return;
     }
-    
-    // Add custom sites to the list
-    customSites.forEach((site, index) => {
+
+    customSites.forEach(site => {
         const li = document.createElement('li');
         li.className = 'blocked-item';
-        
+
         const siteText = document.createElement('span');
         siteText.textContent = site;
         siteText.className = 'site-url';
         li.appendChild(siteText);
-        
+
         const removeButton = document.createElement('button');
         removeButton.textContent = "Unblock";
         removeButton.className = 'unblock-button';
-        removeButton.onclick = function() {
-            removeBlockedSite(site);
-        };
+        removeButton.onclick = () => removeBlockedSite(site);
+
         li.appendChild(removeButton);
-        
         listElement.appendChild(li);
     });
 }
 
-// Validate if a string is a properly formatted domain
 function isValidDomain(domain) {
     return /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/.test(domain);
 }
 
-// Add custom site from user input
 function addBlockedSite() {
     const websiteInput = document.getElementById('website-input').value.trim();
-    // Clean the URL more thoroughly
-    let cleanUrl = websiteInput.replace(/^https?:\/\//, '').replace(/^www\./, '');
-    
-    // Remove any paths, queries or fragments
+
+    let cleanUrl = websiteInput
+        .replace(/^https?:\/\//, '')
+        .replace(/^www\./, '');
+
     cleanUrl = cleanUrl.split('/')[0].split('?')[0].split('#')[0];
-    
+
     if (!cleanUrl) {
         showStatusMessage("Please enter a website URL", true);
         return;
     }
-    
+
     if (!isValidDomain(cleanUrl)) {
         showStatusMessage("Please enter a valid domain name", true);
         return;
     }
-    
-    browser.storage.local.get(['blockedSites'], function(result) {
+
+    browser.storage.local.get(['blockedSites'], function (result) {
         if (browser.runtime.lastError) {
-            console.error("Error loading blocked sites:", browser.runtime.lastError);
             showStatusMessage("Failed to update settings", true);
             return;
         }
-        
+
         const blockedSites = result.blockedSites || [];
-        
-        // Check for duplicate
+
         if (blockedSites.includes(cleanUrl)) {
             showStatusMessage("This website is already blocked");
             document.getElementById('website-input').value = '';
             return;
         }
-        
+
         blockedSites.push(cleanUrl);
-        
-        browser.storage.local.set({ blockedSites: blockedSites }, function() {
+
+        browser.storage.local.set({ blockedSites }, function () {
             if (browser.runtime.lastError) {
-                console.error("Error saving blocked sites:", browser.runtime.lastError);
                 showStatusMessage("Failed to save changes", true);
                 return;
             }
-            
+
             document.getElementById('website-input').value = '';
             updateUIFromSettings();
             showStatusMessage(`${cleanUrl} has been blocked`);
-            
-            // On Android, blur the input field to hide keyboard
+
             if (isAndroid) {
                 document.getElementById('website-input').blur();
             }
@@ -198,90 +182,294 @@ function addBlockedSite() {
     });
 }
 
-// Remove site from blocked list
 function removeBlockedSite(siteToRemove) {
-    browser.storage.local.get(['blockedSites'], function(result) {
+    browser.storage.local.get(['blockedSites'], function (result) {
         if (browser.runtime.lastError) {
-            console.error("Error loading blocked sites:", browser.runtime.lastError);
             showStatusMessage("Failed to unblock website", true);
             return;
         }
-        
+
         const blockedSites = result.blockedSites || [];
         const siteIndex = blockedSites.indexOf(siteToRemove);
-        
-        if (siteIndex !== -1) {
-            blockedSites.splice(siteIndex, 1);
-            
-            browser.storage.local.set({ blockedSites: blockedSites }, function() {
-                if (browser.runtime.lastError) {
-                    console.error("Error saving blocked sites:", browser.runtime.lastError);
-                    showStatusMessage("Failed to save changes", true);
-                    return;
-                }
-                
-                updateUIFromSettings();
-                showStatusMessage(`${siteToRemove} has been unblocked`);
-            });
-        }
+
+        if (siteIndex === -1) return;
+
+        blockedSites.splice(siteIndex, 1);
+
+        browser.storage.local.set({ blockedSites }, function () {
+            if (browser.runtime.lastError) {
+                showStatusMessage("Failed to save changes", true);
+                return;
+            }
+
+            updateUIFromSettings();
+            showStatusMessage(`${siteToRemove} has been unblocked`);
+        });
     });
 }
 
-// Toggle predefined site based on checkbox state
 function togglePredefinedSite(event) {
     const siteUrl = event.target.getAttribute('data-url');
-    
-    browser.storage.local.get(['blockedSites'], function(result) {
+
+    browser.storage.local.get(['blockedSites'], function (result) {
         if (browser.runtime.lastError) {
-            console.error("Error loading blocked sites:", browser.runtime.lastError);
             showStatusMessage("Failed to update settings", true);
             return;
         }
-        
+
         const blockedSites = result.blockedSites || [];
         const siteIndex = blockedSites.indexOf(siteUrl);
-        
+
         if (event.target.checked) {
             if (siteIndex === -1) blockedSites.push(siteUrl);
         } else {
             if (siteIndex !== -1) blockedSites.splice(siteIndex, 1);
         }
-        
-        browser.storage.local.set({ blockedSites: blockedSites }, function() {
+
+        browser.storage.local.set({ blockedSites }, function () {
             if (browser.runtime.lastError) {
-                console.error("Error saving blocked sites:", browser.runtime.lastError);
                 showStatusMessage("Failed to save changes", true);
                 return;
             }
-            
+
             updateUIFromSettings();
         });
     });
 }
 
-// Save all settings
 function saveSettings() {
-    // The individual toggles already save themselves, so we just need to show confirmation
+    // Individual changes are saved immediately.
     showStatusMessage("Settings saved successfully");
 }
 
-// Initialize event listeners
-document.addEventListener('DOMContentLoaded', function() {
-    // Add event listeners for predefined checkboxes
+document.addEventListener('DOMContentLoaded', function () {
+    initializePlatform();
+
     document.querySelectorAll('.site-checkbox').forEach(checkbox => {
         checkbox.addEventListener('change', togglePredefinedSite);
     });
-    
-    // Add event listener for the add website button
-    document.getElementById('add-website').addEventListener('click', addBlockedSite);
-    
-    // Add event listener for the save button
-    document.getElementById('save-button').addEventListener('click', saveSettings);
-    
-    // Add event listener for the enter key in the website input
-    document.getElementById('website-input').addEventListener('keyup', function(event) {
-        if (event.key === 'Enter') {
-            addBlockedSite();
+
+    document.getElementById('add-website').addEventListener(
+        'click',
+        addBlockedSite
+    );
+
+    document.getElementById('save-button').addEventListener(
+        'click',
+        saveSettings
+    );
+
+    document.getElementById('website-input').addEventListener(
+        'keyup',
+        event => {
+            if (event.key === 'Enter') {
+                addBlockedSite();
+            }
         }
-    });
-}); 
+    );
+});
+
+// Dashboard uses the same storage keys as the desktop popup.
+let dashboardSession = null;
+let dashboardTimer = null;
+let dashboardRevision = 0;
+
+function renderFocusStats(stats = {}) {
+    const count = Number.isSafeInteger(stats.blockedAttempts) &&
+        stats.blockedAttempts >= 0
+        ? stats.blockedAttempts
+        : 0;
+
+    const seconds = Number.isSafeInteger(stats.timeSavedSeconds) &&
+        stats.timeSavedSeconds >= 0
+        ? stats.timeSavedSeconds
+        : 0;
+
+    document.getElementById('blocked-attempts').textContent =
+        count.toLocaleString();
+
+    const minutes = Math.floor(seconds / 60);
+
+    document.getElementById('time-saved').textContent = minutes >= 60
+        ? `${Math.floor(minutes / 60)} hr ${minutes % 60} min`
+        : `${minutes} min`;
+}
+
+function renderFocusSession() {
+    const session = dashboardSession;
+
+    const valid = session &&
+        Number.isFinite(session.startedAt) &&
+        Number.isFinite(session.durationMs) &&
+        session.durationMs > 0;
+
+    const elapsed = valid
+        ? Math.max(0, Date.now() - session.startedAt)
+        : 0;
+
+    const remaining = valid
+        ? Math.max(0, session.durationMs - elapsed)
+        : 0;
+
+    const active = valid && !session.endedAt && remaining > 0;
+    const ended = valid && Number.isFinite(session.endedAt);
+
+    const shownElapsed = ended
+        ? Math.max(0, session.endedAt - session.startedAt)
+        : elapsed;
+
+    const progress = valid
+        ? Math.min(100, shownElapsed / session.durationMs * 100)
+        : 0;
+
+    const progressEl = document.getElementById('session-progress');
+    progressEl.value = progress;
+    progressEl.textContent = `${Math.floor(progress)}%`;
+
+    document.getElementById('session-status').textContent = active
+        ? 'Focus in progress'
+        : ended
+            ? 'Session ended'
+            : valid
+                ? 'Session complete!'
+                : 'Ready to focus';
+
+    const seconds = Math.ceil(remaining / 1000);
+
+    document.getElementById('session-remaining').textContent = active
+        ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')} remaining · ${Math.floor(progress)}%`
+        : valid
+            ? `${Math.floor(progress)}% of session completed`
+            : 'Choose a duration and start your session.';
+
+    document.getElementById('start-session').hidden = active;
+    document.getElementById('end-session').hidden = !active;
+    document.getElementById('session-duration').disabled = active;
+
+    if (active) {
+        document.getElementById('session-duration').value =
+            Math.round(session.durationMs / 60000);
+    }
+}
+
+async function saveFocusSession(endSession = false) {
+    const startButton = document.getElementById('start-session');
+    const endButton = document.getElementById('end-session');
+
+    const minutes = Number(
+        document.getElementById('session-duration').value
+    );
+
+    if (
+        !endSession &&
+        (!Number.isInteger(minutes) || minutes < 1 || minutes > 180)
+    ) {
+        showStatusMessage(
+            'Choose a whole number from 1 to 180 minutes.',
+            true
+        );
+        return;
+    }
+
+    startButton.disabled = true;
+    endButton.disabled = true;
+
+    try {
+        const focusSession = endSession
+            ? {
+                ...dashboardSession,
+                endedAt: Date.now()
+            }
+            : {
+                startedAt: Date.now(),
+                durationMs: minutes * 60000
+            };
+
+        await browser.storage.local.set({ focusSession });
+
+        dashboardSession = focusSession;
+        renderFocusSession();
+    } catch (error) {
+        console.error('Failed to save focus session:', error);
+        showStatusMessage(
+            'Could not save your focus session. Please try again.',
+            true
+        );
+    } finally {
+        startButton.disabled = false;
+        endButton.disabled = false;
+    }
+}
+
+function onDashboardStorageChanged(changes, areaName) {
+    if (areaName !== 'local') return;
+
+    dashboardRevision++;
+
+    if (changes.focusStats) {
+        renderFocusStats(changes.focusStats.newValue || {});
+    }
+
+    if (changes.focusSession) {
+        dashboardSession = changes.focusSession.newValue || null;
+        renderFocusSession();
+    }
+
+    if (changes.blockedSites) {
+        updateUIFromSettings();
+    }
+}
+
+async function initializeDashboard() {
+    const startButton = document.getElementById('start-session');
+    startButton.disabled = true;
+
+    browser.storage.onChanged.addListener(onDashboardStorageChanged);
+
+    startButton.addEventListener('click', () => saveFocusSession());
+
+    document.getElementById('end-session').addEventListener(
+        'click',
+        () => saveFocusSession(true)
+    );
+
+    try {
+        // Avoid replacing a recent storage event with an older read.
+        let revision;
+        let saved;
+
+        do {
+            revision = dashboardRevision;
+
+            saved = await browser.storage.local.get([
+                'focusStats',
+                'focusSession'
+            ]);
+        } while (revision !== dashboardRevision);
+
+        renderFocusStats(saved.focusStats || {});
+        dashboardSession = saved.focusSession || null;
+        renderFocusSession();
+    } catch (error) {
+        console.error('Failed to load dashboard:', error);
+        showStatusMessage(
+            'Could not load productivity statistics.',
+            true
+        );
+    } finally {
+        startButton.disabled = false;
+    }
+
+    // Timestamps preserve progress while this page is closed or suspended.
+    dashboardTimer = setInterval(renderFocusSession, 1000);
+}
+
+document.addEventListener('DOMContentLoaded', initializeDashboard);
+
+window.addEventListener('unload', () => {
+    clearInterval(dashboardTimer);
+
+    browser.storage.onChanged.removeListener(
+        onDashboardStorageChanged
+    );
+});
