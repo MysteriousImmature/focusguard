@@ -1,155 +1,185 @@
 let blockedSites = [];
+let blockingEnabled = true;
 let isAndroid = false;
+let settingsRevision = 0;
 
-// Five minutes is an estimate, not measured browsing time.
+// Estimate only: five minutes per cancelled navigation.
 const ESTIMATED_SECONDS_PER_ATTEMPT = 5 * 60;
 let statsWriteQueue = Promise.resolve();
 
-// Detect Android before configuring Android-specific behavior.
 browser.runtime.getPlatformInfo().then(info => {
     isAndroid = info.os === 'android';
 
     if (isAndroid) {
-        browser.browserAction.setPopup({ popup: "" });
+        browser.browserAction.setPopup({ popup: '' });
 
         browser.browserAction.onClicked.addListener(() => {
             browser.runtime.openOptionsPage();
         });
 
-        // Start the refresh timer after platform detection finishes.
-        setInterval(loadBlockedSites, 60000);
-
-        // Refresh the badge after detecting Android.
-        updateBlockingRules();
+        setInterval(loadSettings, 60000);
     }
+
+    updateBlockingRules();
 }).catch(error => {
-    console.error("Error detecting platform:", error);
+    console.error('Error detecting platform:', error);
 });
 
-function loadBlockedSites() {
-    browser.storage.local.get(['blockedSites'], function (result) {
-        if (browser.runtime.lastError) {
-            console.error(
-                "Error loading blocked sites:",
-                browser.runtime.lastError
-            );
-            return;
-        }
+async function loadSettings() {
+    try {
+        // Retry if settings changed while a read was in flight.
+        let revision;
+        let saved;
 
-        blockedSites = result.blockedSites || [];
+        do {
+            revision = settingsRevision;
+
+            saved = await browser.storage.local.get([
+                'blockedSites',
+                'blockingEnabled'
+            ]);
+        } while (revision !== settingsRevision);
+
+        blockedSites = Array.isArray(saved.blockedSites)
+            ? saved.blockedSites
+            : [];
+
+        // Existing installations remain enabled unless explicitly paused.
+        blockingEnabled = saved.blockingEnabled !== false;
+
         updateBlockingRules();
-    });
-}
-
-function isValidDomain(domain) {
-    return /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/.test(domain);
+    } catch (error) {
+        console.error('Failed to load blocking settings:', error);
+    }
 }
 
 function createUrlPattern(domain) {
+    if (typeof domain !== 'string') return null;
+
     let cleanDomain = domain
         .replace(/^https?:\/\//, '')
         .replace(/^www\./, '');
 
     cleanDomain = cleanDomain.split('/')[0].split('?')[0].split('#')[0];
 
-    if (!isValidDomain(cleanDomain)) {
-        console.warn("Invalid domain:", domain);
-        return null;
-    }
+    const valid = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/.test(cleanDomain);
 
-    return `*://*.${cleanDomain}/*`;
+    return valid ? `*://*.${cleanDomain}/*` : null;
 }
 
 function updateBlockingRules() {
     try {
-        if (browser.webRequest.onBeforeRequest.hasListener(blockRequest)) {
-            browser.webRequest.onBeforeRequest.removeListener(blockRequest);
+        const requests = browser.webRequest.onBeforeRequest;
+
+        if (requests.hasListener(blockRequest)) {
+            requests.removeListener(blockRequest);
         }
 
-        const urlPatterns = [];
+        const patterns = blockedSites
+            .map(createUrlPattern)
+            .filter(Boolean);
 
-        blockedSites.forEach(site => {
-            const pattern = createUrlPattern(site);
-
-            if (pattern) {
-                urlPatterns.push(pattern);
-            }
-        });
-
-        if (urlPatterns.length > 0) {
-            browser.webRequest.onBeforeRequest.addListener(
+        // Paused mode keeps the saved list but removes blocking.
+        if (blockingEnabled && patterns.length > 0) {
+            requests.addListener(
                 blockRequest,
                 {
-                    urls: urlPatterns,
-                    types: ["main_frame"]
+                    urls: patterns,
+                    types: ['main_frame']
                 },
-                ["blocking"]
+                ['blocking']
             );
         }
 
-        if (isAndroid) {
-            try {
-                // Clear the badge when no sites remain blocked.
-                browser.browserAction.setBadgeText({
-                    text: urlPatterns.length
-                        ? String(urlPatterns.length)
-                        : ""
-                });
+        browser.browserAction.setTitle({
+            title: blockingEnabled
+                ? 'FocusGuard: Blocking on'
+                : 'FocusGuard: Paused'
+        }).catch(error => {
+            console.error('Could not update title:', error);
+        });
 
-                browser.browserAction.setBadgeBackgroundColor({
-                    color: "#4f46e5"
-                });
-            } catch (error) {
-                console.log("Badge not supported:", error);
-            }
-        }
+        browser.browserAction.setBadgeText({
+            text: !blockingEnabled
+                ? 'OFF'
+                : isAndroid && patterns.length
+                    ? String(patterns.length)
+                    : ''
+        }).catch(error => {
+            console.error('Could not update badge:', error);
+        });
+
+        browser.browserAction.setBadgeBackgroundColor({
+            color: blockingEnabled ? '#4f46e5' : '#6b7280'
+        }).catch(error => {
+            console.error('Could not update badge color:', error);
+        });
     } catch (error) {
-        console.error("Error updating blocking rules:", error);
+        console.error('Error updating blocking rules:', error);
     }
 }
 
-// Queue writes to avoid losing counts during simultaneous requests.
 function recordBlockedAttempt() {
     statsWriteQueue = statsWriteQueue.then(async () => {
-        const savedStats = await browser.storage.local.get('focusStats');
-        const focusStats = savedStats.focusStats || {};
+        const saved = await browser.storage.local.get('focusStats');
+        const stats = saved.focusStats || {};
 
-        const count = Number.isSafeInteger(focusStats.blockedAttempts) &&
-            focusStats.blockedAttempts >= 0
-            ? focusStats.blockedAttempts
+        const count = Number.isSafeInteger(stats.blockedAttempts) &&
+            stats.blockedAttempts >= 0
+            ? stats.blockedAttempts
             : 0;
 
-        const saved = Number.isSafeInteger(focusStats.timeSavedSeconds) &&
-            focusStats.timeSavedSeconds >= 0
-            ? focusStats.timeSavedSeconds
+        const seconds = Number.isSafeInteger(stats.timeSavedSeconds) &&
+            stats.timeSavedSeconds >= 0
+            ? stats.timeSavedSeconds
             : 0;
 
         await browser.storage.local.set({
             focusStats: {
                 blockedAttempts: count + 1,
-                timeSavedSeconds: saved + ESTIMATED_SECONDS_PER_ATTEMPT
+                timeSavedSeconds:
+                    seconds + ESTIMATED_SECONDS_PER_ATTEMPT
             }
         });
     }).catch(error => {
-        console.error("Failed to save focus statistics:", error);
+        console.error('Failed to save focus statistics:', error);
     });
 }
 
 function blockRequest() {
-    recordBlockedAttempt();
+    // Also protect requests dispatched immediately before pausing.
+    if (!blockingEnabled) {
+        return { cancel: false };
+    }
 
-    // Cancel synchronously; statistics save independently.
+    recordBlockedAttempt();
     return { cancel: true };
 }
 
 browser.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName === 'local' && changes.blockedSites) {
-        blockedSites = changes.blockedSites.newValue || [];
-        updateBlockingRules();
+    if (areaName !== 'local') return;
+
+    if (!changes.blockedSites && !changes.blockingEnabled) {
+        return;
     }
+
+    settingsRevision++;
+
+    if (changes.blockedSites) {
+        blockedSites = Array.isArray(changes.blockedSites.newValue)
+            ? changes.blockedSites.newValue
+            : [];
+    }
+
+    if (changes.blockingEnabled) {
+        blockingEnabled =
+            changes.blockingEnabled.newValue !== false;
+    }
+
+    updateBlockingRules();
 });
 
-browser.runtime.onStartup.addListener(loadBlockedSites);
-browser.runtime.onInstalled.addListener(loadBlockedSites);
+browser.runtime.onStartup.addListener(loadSettings);
+browser.runtime.onInstalled.addListener(loadSettings);
 
-loadBlockedSites();
+loadSettings();
