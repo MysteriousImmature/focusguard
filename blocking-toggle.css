@@ -1,0 +1,105 @@
+.blocking-control {
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  border-radius: 10px;
+}
+
+.blocking-control[data-enabled="false"] {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.blocking-control-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 48px;
+  color: #1f2937;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.blocking-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+#blocking-enabled {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.blocking-switch-track {
+  position: absolute;
+  inset: 0;
+  background: #6b7280;
+  border-radius: 28px;
+  pointer-events: none;
+}
+
+.blocking-switch-track::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+}
+
+#blocking-enabled:checked + .blocking-switch-track {
+  background: #4f46e5;
+}
+
+#blocking-enabled:checked + .blocking-switch-track::before {
+  transform: translateX(20px);
+}
+
+#blocking-enabled:focus-visible + .blocking-switch-track {
+  outline: 2px solid #4338ca;
+  outline-offset: 4px;
+}
+
+#blocking-enabled:disabled {
+  cursor: wait;
+}
+
+#blocking-enabled:disabled + .blocking-switch-track {
+  opacity: 0.6;
+}
+
+#blocking-state {
+  margin: 4px 0;
+  color: #3730a3;
+  font-weight: 600;
+}
+
+.blocking-control[data-enabled="false"] #blocking-state {
+  color: #374151;
+}
+
+#blocking-help {
+  margin: 6px 0 0;
+  font-size: 0.85em;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
+#blocking-error {
+  margin: 8px 0 0;
+  color: #b91c1c;
+  font-size: 0.9em;
+}
